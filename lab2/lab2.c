@@ -1,13 +1,15 @@
 #include <stdio.h>  
 #include <math.h>  
-
+//srtq256 = 16
+//256, 16, 4, 2, 1
 int main()  
 {  
-    int a;
+    int a = 256;
 
-    for (a = 256; a > 1; a = sqrt(a))  
+    while (a > 1)  
     {  
         printf("%d\n", a);  
+        a = sqrt(a);
     }  
 
     printf("%d\n", 1);  
