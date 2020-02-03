@@ -21,6 +21,5 @@ d) double: 3.333333
 4. 12 % 3 = 0
 
 5. -11 % 3 = -2
-//the above is fishy, clang may differ from gcc
 
 
