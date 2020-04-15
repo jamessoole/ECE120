@@ -1,3 +1,16 @@
+; James Soole   4/15/20
+; This programs takes an input of 10 numbers beginning at adress x3132
+; and sums all the positive values, storing the result in R5.
+; It initializes R5 to zero, using R4 (init. to 10) as a counter and R2 as tmp
+; storage for each number. The loop body increments the address containing the value,
+; decrements the counter, and adds positive values to R5, with exit condition of counter = 0.
+
+; REGISTERS
+; R2 - tmp to hold each of the 10 numbers, used for BR
+; R3 - location of the current number
+; R4 - counter (start at 10), exits loop when equal to 0
+; R5 - holds ths sum of positive numbers
+
 ; This is the file you will use for the lab assignment
 ; Make sure to comment your code properly and don't exceed 
 ; the line limitation for this assignment.  Good luck!
@@ -8,18 +21,19 @@
 
 ; INITIALIZING
 0101 101 101 1 00000;   AND R5,R5,#0    Init: R5 = 0, to hold the sum
-0010 011 000001010;     LD R3,x10       Init: R3 = x3131, 1 less than starting pos. of first number
-0010 100 000001011;     LD R4,x11       Init: R4 = #10, counter, 1 greater than 10
+0010 011 000001011;     LD R3,x11       Init: R3 = x3131, 1 less than starting pos. of first number
+0010 100 000001011;     LD R4,x11       Init: R4 = #10, counter, exit loop at counter=0
 0101 010 010 1 00000;   AND R2,R2,#0    Init: R2 = 0, tmp to hold number and check for BR
 
 ; START LOOP
-0001 011 011 1 00001;   ADD R3,R3,#1    R3 = R3 + 1, moves to next input value
-0001 100 100 1 11110;   ADD R4,R4,#-1   R4 = R4 - 1, decrements counter
-0110 010 011 000000;    LDR R2,R3,#0    R2 = M[R3], load the next number into R2
-0000 110 111111100;     BRnz #-4        Check if current number is positive, restarts loop otherwise
-0001 101 101 0 00 010;  ADD R5,R5,R2    R5 = R5 + R2, adds the positive number to sum
 0001 100 100 1 00000;   ADD R4,R4,#0    R4 = R4, reload R4 for counter check
-0000 001 111111001;     BRp #-7         Restarts loop if counter not yet zero
+0000 010 000000110;     BRz #6          Move to end if counter is zero
+0001 011 011 1 00001;   ADD R3,R3,#1    R3 = R3 + 1, moves to next input value
+0001 100 100 1 11111;   ADD R4,R4,#-1   R4 = R4 - 1, decrements counter
+0110 010 011 000000;    LDR R2,R3,#0    R2 = M[R3], load the next number into R2
+0000 110 111111010;     BRnz #-6        Check if current number is positive, restarts loop otherwise
+0001 101 101 0 00 010;  ADD R5,R5,R2    R5 = R5 + R2, adds the positive number to sum
+0000 111 111111000;     BRnzp #-8         Restart loop
 
 ; ENDING STAGE
 1111 0000 0010 0101;    Trap x25        To halt the program
