@@ -6,3 +6,23 @@
 
 ; The program description and code starts here
 
+; INITIALIZING
+0101 101 101 1 00000;   AND R5,R5,#0    Init: R5 = 0, to hold the sum
+0010 011 000001010;     LD R3,x10       Init: R3 = x3131, 1 less than starting pos. of first number
+0010 100 000001011;     LD R4,x11       Init: R4 = #10, counter, 1 greater than 10
+0101 010 010 1 00000;   AND R2,R2,#0    Init: R2 = 0, tmp to hold number and check for BR
+
+; START LOOP
+0001 011 011 1 00001;   ADD R3,R3,#1    R3 = R3 + 1, moves to next input value
+0001 100 100 1 11110;   ADD R4,R4,#-1   R4 = R4 - 1, decrements counter
+0110 010 011 000000;    LDR R2,R3,#0    R2 = M[R3], load the next number into R2
+0000 110 111111100;     BRnz #-4        Check if current number is positive, restarts loop otherwise
+0001 101 101 0 00 010;  ADD R5,R5,R2    R5 = R5 + R2, adds the positive number to sum
+0001 100 100 1 00000;   ADD R4,R4,#0    R4 = R4, reload R4 for counter check
+0000 001 111111001;     BRp #-7         Restarts loop if counter not yet zero
+
+; ENDING STAGE
+1111 0000 0010 0101;    Trap x25        To halt the program
+0011 0001 0011 0001;    Store x3131     For use when initializing R3
+0000 0000 0000 1010;    Store #10       For use when initializing R4
+
