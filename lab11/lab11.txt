@@ -1,9 +1,22 @@
 Question 1: Describe the errors that occur when trying to assemble lab11.asm. Identify the cause of each error.
-
+Line 14: starting adress was missing .ORIG
+Line 17: adress for LD was incorrect, out of range
+Line 19: extra comma
+Line 30: adress for LD was incorrect, out of range
+Line 32: BRzp was mislabeled as BRpz
+Line 41: missing a .END
+Line 355: ST location left as placeholder, should be RESULT
 
 
 Question 2: For each label in the code, write down the corresponding memory location. 
+OUTERLOOP: x300A
+INNERLOOP: x300B
+INPUT: x0014
+ZERO: x0015
+NEG!: x0016
+Result; x0017
 
 
 
 Question 3: Between using labels and explicit memory locations/offsets, which one makes the most sense, and why?
+Using labels is easier for a human to understand. They also don't have to change when inserting/removing lines.
