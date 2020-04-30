@@ -13,13 +13,12 @@
 
 ;R0 - for output chars
 ;R1 - value of Big char
-;	- reused,
+;	- reused, the .FILL ASCII value corresponding to a row
 ;R2 - address of first .FILL line of big char
 ;R3 - Row counter
 ;R4 - Column Counter
-;R5 - .
+;R5 - '1-bit' char input
 ;R6 - '0-bit' char input
-;R8 - '1-bit' char input
 
 
 .ORIG x3000
@@ -30,13 +29,12 @@
 	AND R4, R4, #0
 	AND R5, R5, #0
 	AND R6, R6, #0
-	AND R8, R8, #0
 
 	LEA R2, FONT_DATA	;tmp start point address
 	ADD R6, R6, x5000	;0-bit char address
 	LDR R6, R6, #0		;0-bit char value
-	ADD R8, R8, x5001	;1-bit char address
-	LDR R8, R8, #0		;1-bit char value
+	ADD R5, R5, x5001	;1-bit char address
+	LDR R5, R5, #0		;1-bit char value
 	ADD R1, R1, x5002	;big char adress x5002
 	LDR R1, R1, #0		;big char value			;works??
 
@@ -55,25 +53,25 @@ NEXT_ROW
  	BRz DONE			;done if row counter R3 = 0
 	AND R4, R4, #0		
  	ADD R4, R4, #8		;set column count to 8
-	LDR R5, R2, #0		;load R5 w/ .FILL ASCII at R2 address corresp. to a full row
+	LDR R1, R2, #0		;load R1 w/ .FILL ASCII at R2 address corresp. to a full row
 
 NEXT_COLUMN
 	ADD R4, R4, #0
  	BRz DONE_ROW		;finished the row if column count R4=0
 
 	AND R0, R0, #0		;zero R0
-	ADD R5, R5, #0
+	ADD R1, R1, #0
 
-	BRn 1BIT_CHAR
+	BRn ONEBIT_CHAR
 	ADD	RO, R6, #0		;else 0-bit, load value in R6 into R0
 	OUT
 	BRnzp AFTER_OUT		
-	1BIT_CHAR			;if 1-bit, load value in R8 into R0
-	ADD	RO, R8, #0
+	ONEBIT_CHAR			;if 1-bit, load value in R5 into R0
+	ADD	RO, R5, #0
 	OUT
 	
 	AFTER_OUT
-	ADD R5, R5, R5		;left-shift R5
+	ADD R1, R1, R1		;left-shift R1
 	ADD R4, R4, #-1		;decrement column count
 	BRnzp NEXT_COLUMN
 
