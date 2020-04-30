@@ -2,9 +2,9 @@
 
 	.ORIG	x5000
 	
-	.FILL	x2E
-	.FILL	x40
-	.FILL	x48
+	.FILL	x2E	;.
+	.FILL	x40	;@
+	.FILL	x48	;H
 
 	.END
 
