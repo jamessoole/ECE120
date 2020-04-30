@@ -3,12 +3,21 @@
 ; 8 bits (the high 8 bits, for your convenience) marking pixels in the
 ; line for that character.
 
+;This program prints a large version of the ASCII character located at x5002
+;using the ASCII at x5000 as '0-bit' characters and ASCII at x5001 as '1-bit' characters
+;according to the .FILL value given for each large ASCII character.
+;This program uses row and column counters to iterate through every value to be printed.
+;In each row, the .FILL ASCII value is left-shifted 8 times, with the MSB used to select between
+;the '0-bit' and '1-bit' characters using BR. NL characters are printed after each row,
+; and the row and column counts are decremented until the row count = 0, where the program ends.
+
 ;R0 - for output chars
 ;R1 - value of Big char
+;	- reused,
 ;R2 - address of first .FILL line of big char
 ;R3 - Row counter
 ;R4 - Column Counter
-;R5 - .FILL ASCII corresp. to a full row, will left-shift for each char
+;R5 - .
 ;R6 - '0-bit' char input
 ;R8 - '1-bit' char input
 
