@@ -31,12 +31,13 @@
 	AND R6, R6, #0
 
 	LEA R2, FONT_DATA	;tmp start point address
-	LD R6, ZERO_ADDR	;0-bit char value
-	LD R5, ONE_ADDR		;1-bit char value
-	LD R1, BIG_ADDR		;big char value
+	LDI R6, ZERO_ADDR	;0-bit char value
+	LDI R5, ONE_ADDR	;1-bit char value
+	LDI R1, BIG_ADDR	;big char value
 
 
 INCR_START				
+	ADD R1, R1, #0		;setCC	
 	BRz INIT_ROW		;multiply big char value by 16 
 	ADD R2, R2, #16		;(16 rows per big char) 
 	ADD R1, R1, #-1		;to increase the start adress to right place
@@ -53,18 +54,18 @@ NEXT_ROW
 	LDR R1, R2, #0		;load R1 w/ .FILL ASCII at R2 address corresp. to a full row
 
 NEXT_COLUMN
-	ADD R4, R4, #0
+	ADD R4, R4, #0		;setCC
  	BRz DONE_ROW		;finished the row if column count R4=0
 
 	AND R0, R0, #0		;zero R0
 	ADD R1, R1, #0
 
 	BRn ONEBIT_CHAR
-	ADD	RO, R6, #0		;else 0-bit, load value in R6 into R0
+	ADD	R0, R6, #0		;else 0-bit, load value in R6 into R0
 	OUT
 	BRnzp AFTER_OUT		
 	ONEBIT_CHAR			;if 1-bit, load value in R5 into R0
-	ADD	RO, R5, #0
+	ADD	R0, R5, #0
 	OUT
 	
 	AFTER_OUT
@@ -76,6 +77,7 @@ DONE_ROW
 	LD R0, ASCII_NL 	;newline ASCII
  	OUT
 	ADD R3, R3, #-1		;decrement row counter
+	ADD R2, R2, #1
 	BRnzp NEXT_ROW
 
 
