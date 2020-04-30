@@ -31,12 +31,9 @@
 	AND R6, R6, #0
 
 	LEA R2, FONT_DATA	;tmp start point address
-	ADD R6, R6, x5000	;0-bit char address
-	LDR R6, R6, #0		;0-bit char value
-	ADD R5, R5, x5001	;1-bit char address
-	LDR R5, R5, #0		;1-bit char value
-	ADD R1, R1, x5002	;big char adress x5002
-	LDR R1, R1, #0		;big char value			;works??
+	LD R6, ZERO_ADDR	;0-bit char value
+	LD R5, ONE_ADDR		;1-bit char value
+	LD R1, BIG_ADDR		;big char value
 
 
 INCR_START				
@@ -87,6 +84,12 @@ DONE
 	
 ASCII_NL .FILL xA
 
+ZERO_ADDR
+	.FILL	x5000
+ONE_ADDR
+	.FILL 	x5001
+BIG_ADDR
+	.FILL	x5002
 
 FONT_DATA
 	.FILL	x0000
