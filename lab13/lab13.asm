@@ -15,7 +15,7 @@
 ;R0 - for output chars
 ;	- tmp reuse to calculate next address of big char
 ;	- tmp used in INIT_LETTER_COUNT
-- tmp in NEXT_LETTER
+;	- tmp in NEXT_LETTER
 ;R1 - counter for which Big character were on
 ;R2 - address of first .FILL line of big char
 ; 	- updated to hold the .FILL ASCII value at that address
@@ -44,7 +44,7 @@ INIT_LETTER_COUNT
 	BRz INIT_FONT		;done w/ init if R4 is x00
 	ADD R6, R6, #1		;increase count of letters
 	ADD R0, R0, #1		;move onto next address
-	LD R4, R0, #0		;R4 holds next ASCII character
+	LDR R4, R0, #0		;R4 holds next ASCII character
 	BRnzp INIT_LETTER_COUNT
 
 
