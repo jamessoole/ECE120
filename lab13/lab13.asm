@@ -86,6 +86,16 @@ NEXT_LETTER
 	
 	ADD R3, R3, #0		;setCC
  	BRz DONE			;done if row counter R3 = 0
+			
+	AND R0, R3, #1		;copy row count into R0
+	INCR_ASCII_ROW		;increase the .FILL address by row count
+	AND R0, R0, #0		;setCC
+	BRz AFTER_ASCII_ROW
+	ADD R0, R0, #-1
+	ADD R2, R2, #1
+	BRnzp INCR_ASCII_ROW	
+
+	AFTER_ASCII_ROW
 	LDR R2, R2, #0		;load R2 w/ .FILL ASCII at R2 address corresp. to a full row
 	ADD R1, R1, #1		;increase curr letter count
 	AND R4, R4, #0		
