@@ -88,10 +88,12 @@ NEXT_LETTER
  	BRz DONE			;done if row counter R3 = 0
 			
 	ADD R0, R3, #0		;copy row count into R0
-	INCR_ASCII_ROW		;increase the .FILL address by row count
+	ADD R0, R0, #-8
+	ADD R0, R0, #-8		;R0 has negative of number of rows done so far
+	INCR_ASCII_ROW		;increase the .FILL address by the rows done so far
 	ADD R0, R0, #0		;setCC
 	BRz AFTER_ASCII_ROW
-	ADD R0, R0, #-1
+	ADD R0, R0, #1
 	ADD R2, R2, #1
 	BRnzp INCR_ASCII_ROW	
 
