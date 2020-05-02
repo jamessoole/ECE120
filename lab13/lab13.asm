@@ -127,7 +127,7 @@ NEXT_COLUMN
 
 DONE_LETTER
 	LEA R2, FONT_DATA	;tmp start point address
-	LEA R4, BIG_ADDR	;R4 holds address that holds x5002, the locaion of the 1st big letter
+	LD R4, BIG_ADDR		;R4 holds x5002, the locaion of the 1st big letter	;CHANGED HERE
 	ADD R0, R1, #0		;copy R1 (curr letter count) into R0
 
 	UPDATE_ADDR
@@ -137,8 +137,7 @@ DONE_LETTER
 	ADD R4, R4, #1		;so that R4 holds the address that contains x500_
 	BRnzp UPDATE_ADDR
 
-	NEW_ADDR			;R4 is the address that contains x500_
-	LDR R4, R4, #0		;R4 now has x500_
+	NEW_ADDR			;R4 contains x500_		;AND HERREE
 	LDR R4, R4, #0		;R4 now has the ASCII value at x500_, the next big char
 
 	INCR_LETTER
