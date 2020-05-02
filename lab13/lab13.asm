@@ -44,6 +44,7 @@
 	ADD R0, R4, #0
 	BRz DONE			;if 1st big char is null, then done
 	LD R0, BIG_ADDR		;R0 holds x5002
+	AND R0, R0, #0		;clear R0
 
 INIT_LETTER_COUNT
 	ADD R4, R4, #0		;setCC
