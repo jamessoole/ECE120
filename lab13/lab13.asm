@@ -96,7 +96,8 @@ DONE_LETTER
 	BRnzp UPDATE_ADDR
 
 	NEW_ADDR			;R4 is the address that contains x500_
-	LDI R4, R4, #0		;R4 now has the ASCII value at x500_
+	LDR R4, R4, #0		;R4 now has x500_
+	LDR R4, R4, #0		;R4 now has the ASCII value at x500_
 
 	INCR_LETTER
 	ADD R4, R4, #0		;setCC	
@@ -4228,3 +4229,7 @@ FONT_DATA
 	.FILL	x0000
 	.FILL	x0000
 	.FILL	x0000
+
+
+
+.END
