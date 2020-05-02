@@ -78,7 +78,7 @@ INIT_ROW
 
 NEXT_LETTER
 	AND R0, R0, #0		;clear R0
-	AND R0, R6, #1		;copy R6 (total letter count) into R0
+	ADD R0, R6, #0		;copy R6 (total letter count) into R0
 	NOT R0, R0
 	ADD R0, R0, #1
 	ADD R0, R0, R1		;total letter count - curr letter
@@ -87,7 +87,7 @@ NEXT_LETTER
 	ADD R3, R3, #0		;setCC
  	BRz DONE			;done if row counter R3 = 0
 			
-	AND R0, R3, #1		;copy row count into R0
+	ADD R0, R3, #0		;copy row count into R0
 	INCR_ASCII_ROW		;increase the .FILL address by row count
 	AND R0, R0, #0		;setCC
 	BRz AFTER_ASCII_ROW
@@ -127,7 +127,7 @@ NEXT_COLUMN
 DONE_LETTER
 	LEA R2, FONT_DATA	;tmp start point address
 	LEA R4, BIG_ADDR	;R4 holds x5002, the locaion of the 1st big letter
-	AND R0, R1, #1		;copy R1 (curr letter count) into R0
+	ADD R0, R1, #0		;copy R1 (curr letter count) into R0
 
 	UPDATE_ADDR
 	ADD R0, R0, #0		;setCC
