@@ -24,7 +24,7 @@
 .ORIG x3000
 	AND R0, R0, #0	;set all reg to 0
 	AND R1, R1, #0
-	AND R2, R3, #0
+	AND R2, R2, #0
 	AND R3, R3, #0
 	AND R4, R4, #0
 	AND R5, R5, #0
