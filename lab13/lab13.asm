@@ -37,8 +37,13 @@
 	AND R5, R5, #0
 	AND R6, R6, #0
 
-	LD R0, BIG_ADDR		;R0 holds x5002
+	
 	LDI R4, BIG_ADDR	;R4 holds big char ASCII value
+	;HERE
+	AND R0, R0, #0		;clear R0
+	ADD R0, R4, #0
+	BRz DONE			;if 1st big char is null, then done
+	LD R0, BIG_ADDR		;R0 holds x5002
 
 INIT_LETTER_COUNT
 	ADD R4, R4, #0		;setCC
@@ -52,10 +57,6 @@ INIT_LETTER_COUNT
 INIT_FONT
 	LEA R2, FONT_DATA	;tmp start point address
 	LDI R4, BIG_ADDR	;big char value
-	;HERE
-	AND R0, R0, #0		;clear R0
-	ADD R0, R4, #0
-	BRz DONE			;if 1st big char is null, then done
 
 
 INCR_START				
