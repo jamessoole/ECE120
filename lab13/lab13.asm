@@ -75,7 +75,6 @@ INIT_ROW
 
 
 
-
 NEXT_LETTER
 	AND R0, R0, #0		;clear R0
 	ADD R0, R6, #0		;copy R6 (total letter count) into R0
