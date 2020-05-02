@@ -39,7 +39,8 @@
 INCR_START				
 	ADD R1, R1, #0		;setCC	
 	BRz INIT_ROW		;multiply big char value by 16 
-	ADD R2, R2, #16		;(16 rows per big char) 
+	ADD R2, R2, #8		;(16 rows per big char) 
+	ADD R2, R2, #8
 	ADD R1, R1, #-1		;to increase the start adress to right place
 	BRnzp INCR_START
 
@@ -58,7 +59,7 @@ NEXT_COLUMN
  	BRz DONE_ROW		;finished the row if column count R4=0
 
 	AND R0, R0, #0		;zero R0
-	ADD R1, R1, #0
+	ADD R1, R1, #0		;setCC
 
 	BRn ONEBIT_CHAR
 	ADD	R0, R6, #0		;else 0-bit, load value in R6 into R0
@@ -77,7 +78,7 @@ DONE_ROW
 	LD R0, ASCII_NL 	;newline ASCII
  	OUT
 	ADD R3, R3, #-1		;decrement row counter
-	ADD R2, R2, #1
+	ADD R2, R2, #1		;increase given .FILL value for next row
 	BRnzp NEXT_ROW
 
 
