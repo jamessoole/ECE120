@@ -172,7 +172,7 @@ DONE
 	
 DONE_NULL
 	;out thing
-	LD R0 NUL	;put nothing into R0
+	LD R0, NUL	;put nothing into R0
 	OUT
 	HALT
 	NUL
