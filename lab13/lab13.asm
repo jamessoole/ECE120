@@ -127,7 +127,7 @@ NEXT_COLUMN
 
 DONE_LETTER
 	LEA R2, FONT_DATA	;tmp start point address
-	LEA R4, BIG_ADDR	;R4 holds x5002, the locaion of the 1st big letter
+	LEA R4, BIG_ADDR	;R4 holds address that holds x5002, the locaion of the 1st big letter
 	ADD R0, R1, #0		;copy R1 (curr letter count) into R0
 
 	UPDATE_ADDR
@@ -146,7 +146,7 @@ DONE_LETTER
 	BRz NEXT_LETTER		;multiply big char value by 16 
 	ADD R2, R2, #8		;(16 rows per big char) 
 	ADD R2, R2, #8
-	ADD R4, R4, #-1		;to increase the start adress in R2 to right place
+	ADD R4, R4, #-1		;to increase the start address in R2 to 1st line of the ASCII's fill
 	BRnzp INCR_LETTER
 
 
