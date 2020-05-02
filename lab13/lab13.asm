@@ -16,7 +16,7 @@
 ;	- tmp reuse to calculate next address of big char
 ;	- tmp used in INIT_LETTER_COUNT
 ;	- tmp in NEXT_LETTER
-;R1 - counter for which Big character were on
+;R1 - counter for which Big character we're on
 ;R2 - address of first .FILL line of big char
 ; 	- updated to hold the .FILL ASCII value at that address
 ;R3 - Row counter
@@ -42,7 +42,7 @@
 
 	AND R0, R0, #0		;clear R0
 	ADD R0, R4, #0
-	BRz DONE_NULL		;if 1st big char is null, then done
+	BRz DONE			;if 1st big char is null, then done
 
 	LD R0, BIG_ADDR		;R0 holds x5002
 
@@ -169,14 +169,7 @@ DONE_ROW
 
 DONE
 	HALT
-	
-DONE_NULL
-	;out thing
-	LD R0, NUL	;put nothing into R0
-	OUT
-	HALT
-	NUL
-	.FILL x0000
+
 
 ASCII_NL .FILL xA
 
