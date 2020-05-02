@@ -89,7 +89,7 @@ NEXT_LETTER
 			
 	ADD R0, R3, #0		;copy row count into R0
 	INCR_ASCII_ROW		;increase the .FILL address by row count
-	AND R0, R0, #0		;setCC
+	ADD R0, R0, #0		;setCC
 	BRz AFTER_ASCII_ROW
 	ADD R0, R0, #-1
 	ADD R2, R2, #1
