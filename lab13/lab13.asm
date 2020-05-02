@@ -14,6 +14,8 @@
 
 ;R0 - for output chars
 ;	- tmp reuse to calculate next address of big char
+;	- tmp used in INIT_LETTER_COUNT
+- tmp in NEXT_LETTER
 ;R1 - counter for which Big character were on
 ;R2 - address of first .FILL line of big char
 ; 	- updated to hold the .FILL ASCII value at that address
@@ -21,7 +23,8 @@
 ;R4 - Column Counter
 ;	- reused at start and in DONE_LETTER to find ASCII of starting big char
 ;R5 - '1-bit' char input
-;R6 - '0-bit' char input
+;	- reused for '0-bit' char input
+;R6 - Letter counter
 
 
 .ORIG x3000
@@ -33,9 +36,21 @@
 	AND R5, R5, #0
 	AND R6, R6, #0
 
+	LD R0, BIG_ADDR		;adress, start at x5002
+	LDI R4, BIG_ADDR	;big char value
+
+INIT_LETTER_COUNT
+	ADD R4, R4, #0		;setCC
+	BRz INIT_FONT		;done w/ init if R4 is x00
+	ADD R6, R6, #1		;increase count of letters
+	ADD R0, R0, #1		;move onto next address
+	LD R4, R0, #0		;R4 holds next ASCII character
+	BRnzp INIT_LETTER_COUNT
+
+
+INIT_FONT
+
 	LEA R2, FONT_DATA	;tmp start point address
-	LDI R6, ZERO_ADDR	;0-bit char value
-	LDI R5, ONE_ADDR	;1-bit char value
 	LDI R4, BIG_ADDR	;big char value
 
 
@@ -54,10 +69,18 @@ INIT_ROW
 
 
 NEXT_LETTER
+	;check if R1 (curr big letter) = R6 (total letter count)
+	AND R0, R0, #0		;clear R0
+	AND R0, R6, #1		;copy R6 into R0
+	NOT R0, R0
+	ADD R0, R0, R1		;calculate difference
+	BRz	DONE_ROW		;finished all letters
+	
 	ADD R3, R3, #0
  	BRz DONE			;done if row counter R3 = 0
 	LDR R2, R2, #0		;load R2 w/ .FILL ASCII at R2 address corresp. to a full row
-	BRz DONE_ROW		;if next letter is x00 (ASCII NUll), youve finished the row
+	ADD R1, R1, #1		;increase curr letter count
+	;BRz DONE_ROW		;if next letter is x00 (ASCII NUll), youve finished the letter	;have to work out for row
 	AND R4, R4, #0		
  	ADD R4, R4, #8		;set column count to 8
 	
@@ -70,10 +93,12 @@ NEXT_COLUMN
 	ADD R2, R2, #0		;setCC
 
 	BRn ONEBIT_CHAR
-	ADD	R0, R6, #0		;else 0-bit, load value in R6 into R0
+	LDI R5, ZERO_ADDR	;0-bit char value
+	ADD	R0, R5, #0		;else 0-bit, load value in R6 into R0
 	OUT
 	BRnzp AFTER_OUT		
 	ONEBIT_CHAR			;if 1-bit, load value in R5 into R0
+	LDI R5, ONE_ADDR	;1-bit char value
 	ADD	R0, R5, #0
 	OUT
 	
@@ -83,7 +108,6 @@ NEXT_COLUMN
 	BRnzp NEXT_COLUMN
 
 DONE_LETTER
-	ADD R1, R1, #1		;move onto next big letter
 	LEA R2, FONT_DATA	;tmp start point address
 	LEA R4, BIG_ADDR	;R4 holds the address of the 1st big letter, x5002
 	AND R0, R1, #1		;copy R1 into R0
@@ -110,7 +134,7 @@ DONE_LETTER
 
 
 DONE_ROW
-	LD R0, ASCII_NL 	;newline ASCII
+	LD R0, ASCII_NL 	;newline ASCII	;this is bad cause regular letters can have n
  	OUT
 	ADD R3, R3, #-1		;decrement row counter
 	
