@@ -3,14 +3,15 @@
 ; 8 bits (the high 8 bits, for your convenience) marking pixels in the
 ; line for that character.
 
-;TODO: edit explanation
-;This program prints a large version of the ASCII character located at x5002
+
+;This program prints a large version of the ASCII characters located at x5002 and subsequent addresses
 ;using the ASCII at x5000 as '0-bit' characters and ASCII at x5001 as '1-bit' characters
 ;according to the .FILL value given for each large ASCII character.
 ;This program uses row and column counters to iterate through every value to be printed.
 ;In each row, the .FILL ASCII value is left-shifted 8 times, with the MSB used to select between
 ;the '0-bit' and '1-bit' characters using BR. NL characters are printed after each row,
 ; and the row and column counts are decremented until the row count = 0, where the program ends.
+;When an ASCII character x00 (NUL) is reached, signifying the end of the string, a new row is started
 
 ;R0 - for output chars
 ;	- tmp reuse to calculate next address of big char
@@ -39,7 +40,7 @@
 
 	
 	LDI R4, BIG_ADDR	;R4 holds big char ASCII value
-	BRz DONE			;if 1st big char is null, then done
+	BRz DONE_NULL		;if 1st big char is null, then done
 	LD R0, BIG_ADDR		;R0 holds x5002
 
 INIT_LETTER_COUNT
@@ -130,6 +131,7 @@ NEXT_COLUMN
 DONE_LETTER
 	LEA R2, FONT_DATA	;tmp start point address
 	LD R4, BIG_ADDR		;R4 holds x5002, the locaion of the 1st big letter	;CHANGED HERE
+
 	ADD R0, R1, #0		;copy R1 (curr letter count) into R0
 
 	UPDATE_ADDR
@@ -165,6 +167,21 @@ DONE_ROW
 
 DONE
 	HALT
+
+DONE_NULL
+	AND R5, R5, #0		;clear R5
+	ADD R5, R5, #8		;add 16 NLs
+	ADD R5, R5, #8
+	NULL_LOOP
+	ADD R5, R5, #0		;setCC
+	BRz NULL_END
+	ADD R5, R5, #-1
+	LD R0, ASCII_NL
+	OUT
+	BRnzp NULL_LOOP
+	NULL_END
+	HALT
+
 
 
 ASCII_NL .FILL xA
