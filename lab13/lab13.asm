@@ -3,25 +3,30 @@
 ; 8 bits (the high 8 bits, for your convenience) marking pixels in the
 ; line for that character.
 
-;TODO: edit explanation
-;This program prints a large version of the ASCII character located at x5002
+
+;This program prints a large version of the ASCII characters located at x5002 and subsequent addresses
 ;using the ASCII at x5000 as '0-bit' characters and ASCII at x5001 as '1-bit' characters
 ;according to the .FILL value given for each large ASCII character.
 ;This program uses row and column counters to iterate through every value to be printed.
 ;In each row, the .FILL ASCII value is left-shifted 8 times, with the MSB used to select between
 ;the '0-bit' and '1-bit' characters using BR. NL characters are printed after each row,
 ; and the row and column counts are decremented until the row count = 0, where the program ends.
+;When an ASCII character x00 (NUL) is reached, signifying the end of the string, a new row is started
 
 ;R0 - for output chars
 ;	- tmp reuse to calculate next address of big char
-;R1 - counter for which Big character were on
+;	- tmp used in INIT_LETTER_COUNT
+;	- tmp in NEXT_LETTER
+;R1 - counter for which Big character we're on
 ;R2 - address of first .FILL line of big char
 ; 	- updated to hold the .FILL ASCII value at that address
 ;R3 - Row counter
 ;R4 - Column Counter
 ;	- reused at start and in DONE_LETTER to find ASCII of starting big char
+;	- and in INIT_LETTER_COUNT
 ;R5 - '1-bit' char input
-;R6 - '0-bit' char input
+;	- reused for '0-bit' char input
+;R6 - Letter counter
 
 
 .ORIG x3000
@@ -33,9 +38,22 @@
 	AND R5, R5, #0
 	AND R6, R6, #0
 
+	
+	LDI R4, BIG_ADDR	;R4 holds big char ASCII value
+	BRz DONE_NULL		;if 1st big char is null, then done
+	LD R0, BIG_ADDR		;R0 holds x5002
+
+INIT_LETTER_COUNT
+	ADD R4, R4, #0		;setCC
+	BRz INIT_FONT		;done w/ init if R4 is x00
+	ADD R6, R6, #1		;increase letter count
+	ADD R0, R0, #1		;move onto next address
+	LDR R4, R0, #0		;R4 holds next ASCII character
+	BRnzp INIT_LETTER_COUNT
+
+
+INIT_FONT
 	LEA R2, FONT_DATA	;tmp start point address
-	LDI R6, ZERO_ADDR	;0-bit char value
-	LDI R5, ONE_ADDR	;1-bit char value
 	LDI R4, BIG_ADDR	;big char value
 
 
@@ -48,16 +66,42 @@ INCR_START
 	BRnzp INCR_START
 
 INIT_ROW
-	AND R4, R4, #0		;clear column counter
 	ADD R3, R3, #8		;set row counter = 16
 	ADD R3, R3, #8
 
 
+
+; ALL INIT ^^^
+; R3 (row count) and R2 (location of needed .FILL value) carry over
+; R6 total letter count carrys over
+; R4 will be cleared
+
+
+
 NEXT_LETTER
-	ADD R3, R3, #0
+	AND R0, R0, #0		;clear R0
+	ADD R0, R6, #0		;copy R6 (total letter count) into R0
+	NOT R0, R0
+	ADD R0, R0, #1
+	ADD R0, R0, R1		;total letter count - curr letter
+	BRz	DONE_ROW		;finished all letters
+	
+	ADD R3, R3, #0		;setCC
  	BRz DONE			;done if row counter R3 = 0
+			
+	ADD R0, R3, #0		;copy row count into R0
+	ADD R0, R0, #-8
+	ADD R0, R0, #-8		;R0 has negative of number of rows done so far
+	INCR_ASCII_ROW		;increase the .FILL address by the rows done so far
+	ADD R0, R0, #0		;setCC
+	BRz AFTER_ASCII_ROW
+	ADD R0, R0, #1
+	ADD R2, R2, #1
+	BRnzp INCR_ASCII_ROW	
+
+	AFTER_ASCII_ROW
 	LDR R2, R2, #0		;load R2 w/ .FILL ASCII at R2 address corresp. to a full row
-	BRz DONE_ROW		;if next letter is x00 (ASCII NUll), youve finished the row
+	ADD R1, R1, #1		;increase curr letter count
 	AND R4, R4, #0		
  	ADD R4, R4, #8		;set column count to 8
 	
@@ -67,13 +111,15 @@ NEXT_COLUMN
  	BRz DONE_LETTER		;finished the letter if column count R4=0
 
 	AND R0, R0, #0		;clear R0
-	ADD R2, R2, #0		;setCC
+	ADD R2, R2, #0		;setCC for ASCII
 
 	BRn ONEBIT_CHAR
-	ADD	R0, R6, #0		;else 0-bit, load value in R6 into R0
+	LDI R5, ZERO_ADDR	;0-bit char value
+	ADD	R0, R5, #0		;else 0-bit, load value in R5 into R0
 	OUT
 	BRnzp AFTER_OUT		
 	ONEBIT_CHAR			;if 1-bit, load value in R5 into R0
+	LDI R5, ONE_ADDR	;1-bit char value
 	ADD	R0, R5, #0
 	OUT
 	
@@ -83,10 +129,10 @@ NEXT_COLUMN
 	BRnzp NEXT_COLUMN
 
 DONE_LETTER
-	ADD R1, R1, #1		;move onto next big letter
 	LEA R2, FONT_DATA	;tmp start point address
-	LEA R4, BIG_ADDR	;R4 holds the address of the 1st big letter, x5002
-	AND R0, R1, #1		;copy R1 into R0
+	LD R4, BIG_ADDR		;R4 holds x5002, the locaion of the 1st big letter	;CHANGED HERE
+
+	ADD R0, R1, #0		;copy R1 (curr letter count) into R0
 
 	UPDATE_ADDR
 	ADD R0, R0, #0		;setCC
@@ -95,16 +141,17 @@ DONE_LETTER
 	ADD R4, R4, #1		;so that R4 holds the address that contains x500_
 	BRnzp UPDATE_ADDR
 
-	NEW_ADDR			;R4 is the address that contains x500_
-	LDI R4, R4, #0		;R4 now has the ASCII value at x500_
+	NEW_ADDR			;R4 contains x500_		;AND HERREE
+	LDR R4, R4, #0		;R4 now has the ASCII value at x500_, the next big char
 
 	INCR_LETTER
 	ADD R4, R4, #0		;setCC	
 	BRz NEXT_LETTER		;multiply big char value by 16 
 	ADD R2, R2, #8		;(16 rows per big char) 
 	ADD R2, R2, #8
-	ADD R4, R4, #-1		;to increase the start adress in R2 to right place
+	ADD R4, R4, #-1		;to increase the start address in R2 to 1st line of the ASCII's fill
 	BRnzp INCR_LETTER
+
 
 
 
@@ -114,14 +161,29 @@ DONE_ROW
 	ADD R3, R3, #-1		;decrement row counter
 	
 	AND R4, R4, #0		;reset column counter
-	AND R1, R1, #0		;reset R1 to -1 (will increase to 0 in DONE_LETTER) to go back to first big char
-	ADD R1, R1, #-1		
+	AND R1, R1, #0		;reset R1 (curr letter))
 	BRnzp DONE_LETTER
 
 
 DONE
 	HALT
-	
+
+DONE_NULL
+	AND R5, R5, #0		;clear R5
+	ADD R5, R5, #8		;add 16 NLs
+	ADD R5, R5, #8
+	NULL_LOOP
+	ADD R5, R5, #0		;setCC
+	BRz NULL_END
+	ADD R5, R5, #-1
+	LD R0, ASCII_NL
+	OUT
+	BRnzp NULL_LOOP
+	NULL_END
+	HALT
+
+
+
 ASCII_NL .FILL xA
 
 ZERO_ADDR
@@ -4228,3 +4290,7 @@ FONT_DATA
 	.FILL	x0000
 	.FILL	x0000
 	.FILL	x0000
+
+
+
+.END
